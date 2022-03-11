@@ -11,11 +11,11 @@ const USER = 'root';
 const PASSWORD = 'bcd127';
 const DATABASE = 'dbcontatos';
 
-$resultado = conectarMysql();
+// $resultado = conectarMysql();
 
-echo('<pre>');
-print_r($resultado);
-echo('</pre>');
+// echo('<pre>');
+// print_r($resultado);
+// echo('</pre>');
 
  function conectarMysql(){
     $conexao = array();
@@ -23,6 +23,7 @@ echo('</pre>');
     // Retorna um array de dados sobre a conexão, caso a mesma dê certo
     $conexao = mysqli_connect(SERVER, USER, PASSWORD, DATABASE);
 
+    // Validação para saber se a conexão foi realizada com sucesso
     if($conexao){
         return $conexao;
    
