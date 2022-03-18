@@ -21,14 +21,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $action = strtoupper($_GET['action']);
 
     // Estrutura condicional para validar quem esta solicitando algo para o Router
+
     switch ($component) {
         case 'CONTATOS':
             // Import da controller Contatos
             require_once('controller/controllerContatos.php');
 
-            if($action == 'INSERIR')
-                inserirContato($_POST);
-
+            // Validação para identificar o tipo de ação que será realizada
+            if ($action == 'INSERIR') {
+                // Chama a função de inserir na controller
+                $resposta = inserirContato($_POST);
+                // Valida se o retorno foi verdadeiro
+                if(is_bool($resposta)){ // Se for booleano
+                    if($resposta){
+                        echo ("<script> 
+                        alert('Registro inserido com sucesso!');
+                        window.location.href = 'index.php';
+                      </script>");  
+                    }
+                // Se o retorno for um array significa que houve erro no processo de inserção
+                }elseif(is_array($resposta)){
+                    echo ("<script>
+                    alert('".$resposta['message']."');
+                    window.history.back();
+                  </script>");  
+                }
+                                    
+            }
             break;
     }
 }

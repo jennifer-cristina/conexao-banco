@@ -14,12 +14,12 @@ function inserirContato($dadosContato)
     // Validação para verificar se o objeto esta vazio
     if (!empty($dadosContato)) {
         // Validação de caixa vazia dos elementos nome, celular e email, pois são obrigatórios no banco de dados
-        if (!empty($dadosContato['txtNome']) && !empty($dadosContato['txtCelular']) && !empty($dadosContato['txtEmail'])){
+        if (!empty($dadosContato['txtNome']) && !empty($dadosContato['txtCelular']) && !empty($dadosContato['txtEmail'])) {
 
             // Criação do array de dados que será encaminhado a model para inserir no banco de dados, é importante criar este array
             // conforme as necessidades de manipulação do banco de dados
             // Observação: Criar as chaves conforme os nomes dos atributos do banco de dados
-            $arrayDados = array (
+            $arrayDados = array(
                 "nome"      => $dadosContato['txtNome'],
                 "telefone"  => $dadosContato['txtTelefone'],
                 "celular"   => $dadosContato['txtCelular'],
@@ -28,9 +28,21 @@ function inserirContato($dadosContato)
 
             );
 
+            // import do arquivo de modelagem para manipular o BD
             require_once('./model/bd/contato.php');
-            insertContato($arrayDados);
-        }
+            // Chama a função que fará o insert no BD (esta função esta no model)
+            if (insertContato($arrayDados))
+                return true;
+            else
+                return array(
+                    'idErro'  => 1,
+                    'message' => 'Não foi possível inserir os dados no Banco de Dados'
+                );
+        } else
+            return array(
+                'idErro'  => 2,
+                'message' => 'Existem campos obrigatórios que não foram inseridos'
+            );
     }
 }
 
@@ -47,4 +59,15 @@ function excluirContato()
 // Função para solicitar os dados da model e encaminhar a lista de contatos para a View
 function listarContato()
 {
+
+    // import do arquivo que vai buscar os dados no Banco de dados
+    require_once('model/bd/contato.php');
+
+    // Chama a função que vai buscar os dados no Banco de dados
+    $dados = selectAllContato();
+
+    if (!empty($dados))
+        return $dados;
+    else
+        return false;
 }
