@@ -52,8 +52,24 @@ function atualizarContato()
 }
 
 // Função para realizar a exclusão de um contato 
-function excluirContato()
+function excluirContato($id)
 {
+    if($id != 0 && !empty($id) && is_numeric($id)){
+
+        // import do arquivo de contato
+        require_once('model/bd/contato.php');
+
+        // Chama a função da model e valida se o retorno foi verdadeiro ou false
+        if (deleteContato($id))
+            return true;
+        else
+            return array ('idErro'  => 3,
+                          'message' => 'O banco não pode excluir o registro' 
+    );
+    } else
+            return array ('idErro'  => 4,
+            'message' => 'Não é possível excluir um registro sem informar um id válido'
+    ); 
 }
 
 // Função para solicitar os dados da model e encaminhar a lista de contatos para a View

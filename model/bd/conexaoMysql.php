@@ -17,10 +17,11 @@ const DATABASE = 'dbcontatos';
 // print_r($resultado);
 // echo('</pre>');
 
+// abre a conexão com o Banco de dados Mysql
  function conectarMysql(){
     $conexao = array();
 
-    // Retorna um array de dados sobre a conexão, caso a mesma dê certo
+    // Retorna um array de dados sobre a conexão, caso a mesma dê certo, abre a porta do banco de dados
     $conexao = mysqli_connect(SERVER, USER, PASSWORD, DATABASE);
 
     // Validação para saber se a conexão foi realizada com sucesso
@@ -30,6 +31,12 @@ const DATABASE = 'dbcontatos';
     }else{
         return false;
     }
+ }
+
+ // Fecha a conexão com o Banco de dados Mysql
+ function fecharConexaoMysql($conexao){
+
+    mysqli_close($conexao);
  }
  /*
     Existem três formas de realizar a conexão com o DB MySQL no PHP:
