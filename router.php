@@ -53,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'GET')
                 // que foi acionado na index
                 $idContato = $_GET['id'];
 
+                // Chama a função de excluir na controller
                 $resposta = excluirContato($idContato);
 
                 if (is_bool($resposta)) {
@@ -69,6 +70,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'GET')
                     window.history.back();
                   </script>");
                 }
+            }  elseif( $action == 'BUSCAR'){
+
+              // Recebe o id do registro que deverá ser editado, que foi enviado pela url no link da imagem do editar
+                // que foi acionado na index
+                $idContato = $_GET['id'];
+
+                // Chama a função de buscar na controller
+                $dados = buscarContato($idContato);
+
+                // Ativa a utilização de variáveis de sessão no servidor
+                // Sessão: Variáveis que permanecem no navegador mesmo acessando outros links do site
+                session_start();
+
+                // Guarda em uma variável de sessão os dados que o banco de dados retornou para a busca do id
+                // Obs: essa variável de sessão será utilizada na index.php, para colocar os dados nas caixas de texto
+                $_SESSION['dadosContato'] = $dados;
+
+                // Utilizando o header também poderemos chamar a index.php, porém haverá uma ação de carregamento no navegador (piscando a tela novamente)
+                // header('location: index.php');
+               
+                // importando a index, assim não havendo um novo carregamento da página  
+                require_once('index.php');
+
             }
             break;
     }

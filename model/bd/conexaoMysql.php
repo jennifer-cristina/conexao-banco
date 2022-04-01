@@ -1,8 +1,8 @@
 <?php
 /*******************************************************
- *    Arquivo para criar a conexão com o bando de dados.
+ *    Arquivo para criar a conexão com o banco de dados.
  * 
- *  Lukas Santos Venancio 25/02/2022
+ *  Jennifer Cristina 25/02/2022
  *  Versão 1.0
  *****************************************************/
 

@@ -54,7 +54,9 @@ function atualizarContato()
 // Função para realizar a exclusão de um contato 
 function excluirContato($id)
 {
-    if($id != 0 && !empty($id) && is_numeric($id)){
+
+    // Validação para verificar se id contém um numero válido
+    if ($id != 0 && !empty($id) && is_numeric($id)) {
 
         // import do arquivo de contato
         require_once('model/bd/contato.php');
@@ -63,13 +65,15 @@ function excluirContato($id)
         if (deleteContato($id))
             return true;
         else
-            return array ('idErro'  => 3,
-                          'message' => 'O banco não pode excluir o registro' 
-    );
+            return array(
+                'idErro'  => 3,
+                'message' => 'O banco não pode excluir o registro'
+            );
     } else
-            return array ('idErro'  => 4,
+        return array(
+            'idErro'  => 4,
             'message' => 'Não é possível excluir um registro sem informar um id válido'
-    ); 
+        );
 }
 
 // Função para solicitar os dados da model e encaminhar a lista de contatos para a View
@@ -86,4 +90,30 @@ function listarContato()
         return $dados;
     else
         return false;
+}
+
+// Função para buscar um contato através do id do registro
+function buscarContato($id)
+{
+
+    // Validação para verificar se id contém um numero válido
+    if ($id != 0 && !empty($id) && is_numeric($id)) {
+
+        // import do arquivo de contato
+        require_once('model/bd/contato.php');
+
+        // Chama a função na model que vai buscar no banco de dados
+        $dados = selectByIdContato($id);
+
+        // Valida se existem dados para serem devolvidos
+        if (!empty($dados))
+            return $dados;
+        else
+            return false;
+    } else {
+        return array( 
+            'idErro'  => 4,
+            'message' => 'Não é possível buscar um registro sem informar um id válido'
+        );
+    }
 }
