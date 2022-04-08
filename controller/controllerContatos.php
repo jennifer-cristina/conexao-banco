@@ -47,8 +47,50 @@ function inserirContato($dadosContato)
 }
 
 // Função para receber dados da View w caminhar para a model (atualizar)
-function atualizarContato()
+function atualizarContato($dadosContato, $idContato)
 {
+    // Validação para verificar se o objeto esta vazio
+    if (!empty($dadosContato)) {
+        // Validação de caixa vazia dos elementos nome, celular e email, pois são obrigatórios no banco de dados
+        if (!empty($dadosContato['txtNome']) && !empty($dadosContato['txtCelular']) && !empty($dadosContato['txtEmail'])) {
+
+            // Validação para garantir que id seja válido
+            if (!empty($idContato) && $idContato != 0 && is_numeric($idContato)) {
+
+                // Criação do array de dados que será encaminhado a model para inserir no banco de dados, é importante criar este array
+                // conforme as necessidades de manipulação do banco de dados
+                // Observação: Criar as chaves conforme os nomes dos atributos do banco de dados
+                $arrayDados = array(
+                    "id"        => $idContato,
+                    "nome"      => $dadosContato['txtNome'],
+                    "telefone"  => $dadosContato['txtTelefone'],
+                    "celular"   => $dadosContato['txtCelular'],
+                    "email"     => $dadosContato['txtEmail'],
+                    "obs"       => $dadosContato['txtObs']
+
+                );
+
+                // import do arquivo de modelagem para manipular o BD
+                require_once('./model/bd/contato.php');
+                // Chama a função que fará o insert no BD (esta função esta no model)
+                if (updateContato($arrayDados))
+                    return true;
+                else
+                    return array(
+                        'idErro'  => 1,
+                        'message' => 'Não foi possível atualizar os dados no Banco de Dados'
+                    );
+            } else
+                return array(
+                    'idErro'  => 4,
+                    'message' => 'Não é possível editar um registro sem informar um id válido'
+                );
+        } else
+            return array(
+                'idErro'  => 2,
+                'message' => 'Existem campos obrigatórios que não foram inseridos'
+            );
+    }
 }
 
 // Função para realizar a exclusão de um contato 
@@ -111,7 +153,7 @@ function buscarContato($id)
         else
             return false;
     } else {
-        return array( 
+        return array(
             'idErro'  => 4,
             'message' => 'Não é possível buscar um registro sem informar um id válido'
         );
