@@ -30,8 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'GET')
 
       // Validação para identificar o tipo de ação que será realizada
       if ($action == 'INSERIR') {
-        // Chama a função de inserir na controller
-        $resposta = inserirContato($_POST);
+
+        if(isset($_FILES) && !empty($_FILES)){
+          // Chama a função de inserir na controller
+          $resposta = inserirContato($_POST, $_FILES);
+        } else {
+          $resposta = inserirContato($_POST, null);
+        }
+
         // Valida se o retorno foi verdadeiro
         if (is_bool($resposta)) { // Se for booleano
           if ($resposta) {
