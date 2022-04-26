@@ -25,13 +25,15 @@ function insertContato($dadosContato)
                 telefone, 
                 celular, 
                 email, 
-                observacao)
+                observacao,
+                foto)
             values
             ('" . $dadosContato['nome'] . "',
 			'" . $dadosContato['telefone'] . "', 
 			'" . $dadosContato['celular'] . "', 
 			'" . $dadosContato['email'] . "',
-            '" . $dadosContato['obs'] . "');";
+            '" . $dadosContato['obs'] . "',
+            '" . $dadosContato['foto'] . "');";
 
     // Executando o Script no Banco de dados ( passando como parâmetros, o próprio banco de dados e o script que será executado)
     // Validação para verificar se o script está correto 
@@ -138,7 +140,8 @@ function selectAllContato()
                 "telefone"  =>  $rsDados['telefone'],
                 "celular"   =>  $rsDados['celular'],
                 "email"     =>  $rsDados['email'],
-                "obs"       =>  $rsDados['observacao']
+                "obs"       =>  $rsDados['observacao'],
+                "foto"      =>  $rsDados['foto']
             );
             $cont++;
         }

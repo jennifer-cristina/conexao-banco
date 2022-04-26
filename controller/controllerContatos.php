@@ -9,19 +9,28 @@
  *************************************************************************************/
 
 // Função para receber dados da View w caminhar para a model (inserir)
-function inserirContato($dadosContato, $file)
-{
+function inserirContato($dadosContato, $file){
+
+    $nomeFoto = (string) null;
     // Validação para verificar se o objeto esta vazio
     if (!empty($dadosContato)) {
         // Validação de caixa vazia dos elementos nome, celular e email, pois são obrigatórios no banco de dados
         if (!empty($dadosContato['txtNome']) && !empty($dadosContato['txtCelular']) && !empty($dadosContato['txtEmail'])) {
 
+            // Validação para identificar se chegou um arquivo para upload
             if ($file != null){
                 
+                // Import da função de upload
                 require_once('modulo/upload.php');
-                $resultado = uploadFile($file['fileFoto']);
-                echo($resultado);
-                die;
+                // Chama a função de upload colocando-a em uma variável
+                $nomeFoto = uploadFile($file['fileFoto']);
+                
+                if(is_array($nomeFoto)){
+
+                    // Caso aconteça algum erro no processo de upload, a função irá retornar um array com a possível mensagem de erro.
+                    // Esse array será retornado para a router e ela irá exibir a mensagem para o usuário
+                    return $nomeFoto;
+                }
             }
 
             // Criação do array de dados que será encaminhado a model para inserir no banco de dados, é importante criar este array
@@ -32,7 +41,8 @@ function inserirContato($dadosContato, $file)
                 "telefone"  => $dadosContato['txtTelefone'],
                 "celular"   => $dadosContato['txtCelular'],
                 "email"     => $dadosContato['txtEmail'],
-                "obs"       => $dadosContato['txtObs']
+                "obs"       => $dadosContato['txtObs'],
+                "foto"      => $nomeFoto
 
             );
 
