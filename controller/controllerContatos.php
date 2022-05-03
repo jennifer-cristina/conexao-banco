@@ -9,7 +9,8 @@
  *************************************************************************************/
 
 // Função para receber dados da View w caminhar para a model (inserir)
-function inserirContato($dadosContato, $file){
+function inserirContato($dadosContato, $file)
+{
 
     $nomeFoto = (string) null;
     // Validação para verificar se o objeto esta vazio
@@ -18,14 +19,14 @@ function inserirContato($dadosContato, $file){
         if (!empty($dadosContato['txtNome']) && !empty($dadosContato['txtCelular']) && !empty($dadosContato['txtEmail'])) {
 
             // Validação para identificar se chegou um arquivo para upload
-            if ($file != null){
-                
+            if ($file['fileFoto']['name'] != null) {
+
                 // Import da função de upload
                 require_once('modulo/upload.php');
                 // Chama a função de upload colocando-a em uma variável
                 $nomeFoto = uploadFile($file['fileFoto']);
-                
-                if(is_array($nomeFoto)){
+
+                if (is_array($nomeFoto)) {
 
                     // Caso aconteça algum erro no processo de upload, a função irá retornar um array com a possível mensagem de erro.
                     // Esse array será retornado para a router e ela irá exibir a mensagem para o usuário
@@ -65,8 +66,17 @@ function inserirContato($dadosContato, $file){
 }
 
 // Função para receber dados da View w caminhar para a model (atualizar)
-function atualizarContato($dadosContato, $idContato)
+function atualizarContato($dadosContato, $arrayDados)
 {
+    //Recebe o id enviado pelo arrayDados
+    $idContato = $arrayDados['id'];
+
+    //Recebe a foto enviada pelo arrayDados (nome da foto que já existe no bd)
+    $foto = $arrayDados['foto'];
+
+    //Recebe o arquivo 
+    $file = $arrayDados['file'];
+
     // Validação para verificar se o objeto esta vazio
     if (!empty($dadosContato)) {
         // Validação de caixa vazia dos elementos nome, celular e email, pois são obrigatórios no banco de dados
@@ -74,6 +84,19 @@ function atualizarContato($dadosContato, $idContato)
 
             // Validação para garantir que id seja válido
             if (!empty($idContato) && $idContato != 0 && is_numeric($idContato)) {
+
+                // Validação para identificar se será enviado ao servidor uma nova foto
+                if ($file['fileFoto']['name'] != null) {
+
+                    // Import da função de upload
+                    require_once('modulo/upload.php');
+
+                    // Chama a função de upload colocando-a em uma variável para enviar a nova foto ao servidor
+                    $novaFoto = uploadFile($file['fileFoto']);
+                } else {
+                    // Permanece a mesma foto no bd
+                    $novaFoto = $foto;
+                }
 
                 // Criação do array de dados que será encaminhado a model para inserir no banco de dados, é importante criar este array
                 // conforme as necessidades de manipulação do banco de dados
@@ -84,16 +107,18 @@ function atualizarContato($dadosContato, $idContato)
                     "telefone"  => $dadosContato['txtTelefone'],
                     "celular"   => $dadosContato['txtCelular'],
                     "email"     => $dadosContato['txtEmail'],
-                    "obs"       => $dadosContato['txtObs']
+                    "obs"       => $dadosContato['txtObs'],
+                    "foto"      => $novaFoto
 
                 );
 
                 // import do arquivo de modelagem para manipular o BD
                 require_once('./model/bd/contato.php');
                 // Chama a função que fará o insert no BD (esta função esta no model)
-                if (updateContato($arrayDados))
+                if (updateContato($arrayDados)) {
+                    unlink(DIRETORIO_FILE_UPLOAD . $foto);
                     return true;
-                else
+                } else
                     return array(
                         'idErro'  => 1,
                         'message' => 'Não foi possível atualizar os dados no Banco de Dados'
@@ -112,19 +137,32 @@ function atualizarContato($dadosContato, $idContato)
 }
 
 // Função para realizar a exclusão de um contato 
-function excluirContato($id)
+function excluirContato($arrayDados)
 {
+    // Recebe o id do registro que será excluido 
+    $id = $arrayDados['id'];
+    // Recebe o nome da foto que será excluída da pasta do servidor
+    $foto = $arrayDados['foto'];
 
     // Validação para verificar se id contém um numero válido
     if ($id != 0 && !empty($id) && is_numeric($id)) {
 
         // import do arquivo de contato
         require_once('model/bd/contato.php');
+        // import do arquivo de configurações do projeto
+        require_once('modulo/config.php');
 
         // Chama a função da model e valida se o retorno foi verdadeiro ou false
-        if (deleteContato($id))
-            return true;
-        else
+        if (deleteContato($id)) {
+
+            if ($foto != null) {
+
+                // Permite apagar a foto fisicamente do diretório no servidor (unlink())
+                unlink(DIRETORIO_FILE_UPLOAD . $foto);
+                return true;
+            } else
+                return true;
+        } else
             return array(
                 'idErro'  => 3,
                 'message' => 'O banco não pode excluir o registro'

@@ -64,7 +64,8 @@ function updateContato($dadosContato)
                 telefone   = '" . $dadosContato['telefone'] . "', 
                 celular    = '" . $dadosContato['celular'] . "', 
                 email      = '" . $dadosContato['email'] . "', 
-                observacao = '" . $dadosContato['obs'] . "'
+                observacao = '" . $dadosContato['obs'] . "',
+                foto       = '" . $dadosContato['foto'] . "'
             where idcontato =" . $dadosContato['id']; 
             
 
@@ -181,7 +182,8 @@ function selectByIdContato($id)
                 "telefone"  =>  $rsDados['telefone'],
                 "celular"   =>  $rsDados['celular'],
                 "email"     =>  $rsDados['email'],
-                "obs"       =>  $rsDados['observacao']
+                "obs"       =>  $rsDados['observacao'],
+                "foto"       =>  $rsDados['foto']
             );
         }
     }

@@ -58,9 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'GET')
         // Recebe o id do registro que deverá ser excluido, que foi enviado pela url no link da imagem do excluir
         // que foi acionado na index
         $idContato = $_GET['id'];
+        $foto = $_GET['foto'];
+
+        // Criamos um array para encaminhar os valores do id e da foto
+        $arrayDados = array(
+          "id"    => $idContato,
+          "foto"  => $foto
+        );
 
         // Chama a função de excluir na controller
-        $resposta = excluirContato($idContato);
+        $resposta = excluirContato($arrayDados);
 
         if (is_bool($resposta)) {
 
@@ -102,9 +109,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'GET')
 
         // Recebe o id que foi encaminhado no action do form pela URL 
         $idContato = $_GET['id'];
+        // Recebe o nome da foto que foi enviada pelo GET do form
+        $foto = $_GET['foto'];
+
+        // Cria um array contendo o id e o nome da foto para enviar a controller
+        $arrayDados = array(
+          "id"    => $idContato,
+          "foto"  => $foto,
+          "file"  => $_FILES
+        );
 
         // Chama a função de editar na controller
-        $resposta = atualizarContato($_POST, $idContato);
+        $resposta = atualizarContato($_POST, $arrayDados);
         // Valida se o retorno foi verdadeiro
         if (is_bool($resposta)) { // Se for booleano
           if ($resposta) {
