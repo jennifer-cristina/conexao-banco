@@ -1,40 +1,43 @@
-<?php 
-    // import do arquivo de configurações do projeto
-    require_once('modulo/config.php');
+<?php
+// import do arquivo de configurações do projeto
+require_once('modulo/config.php');
 
-    // @ - Esconder o erro debaixo do tabela, não fazer isso!
+// @ - Esconder o erro debaixo do tabela, não fazer isso!
 
-    // $nome = (String) null;
-    // $telefone = (String) null;
-    // $celular = (String) null;
-    // $email = (String) null;
-    // $obs = (String) null;
+// $nome = (String) null;
+// $telefone = (String) null;
+// $celular = (String) null;
+// $email = (String) null;
+// $obs = (String) null;
 
-    // Essa variavel foi criada para diferenciar no action do formulário, qual ação deveria ser levada para o router (inserir ou editar).
-    // Nas condições abaixo, mudamos o action dessa variavel para a ação de editar
-    $form = (string) "router.php?component=contatos&action=inserir";
-    // Variável para carregar o nome da foto do banco de dados
-    $foto = (string) null;
+// Essa variavel foi criada para diferenciar no action do formulário, qual ação deveria ser levada para o router (inserir ou editar).
+// Nas condições abaixo, mudamos o action dessa variavel para a ação de editar
+$form = (string) "router.php?component=contatos&action=inserir";
+// Variável para carregar o nome da foto do banco de dados
+$foto = (string) null;
+// Variável para ser utlizada no carregar dos estados (opção de editar)
+$idEstado = (string) null;
 
-    // Valida se a utilização de variáveis de sessão esta ativa no servidor
-    if(session_status()){
-        // Valida se a variável de sessão dadosContato não esta vázia
-        if(!empty($_SESSION['dadosContato'])){
-            $id        = $_SESSION['dadosContato']['id'];
-            $nome      = $_SESSION['dadosContato']['nome'];
-            $telefone  = $_SESSION['dadosContato']['telefone'];
-            $celular   = $_SESSION['dadosContato']['celular'];
-            $email     = $_SESSION['dadosContato']['email'];
-            $obs       = $_SESSION['dadosContato']['obs'];
-            $foto       = $_SESSION['dadosContato']['foto'];
+// Valida se a utilização de variáveis de sessão esta ativa no servidor
+if (session_status()) {
+    // Valida se a variável de sessão dadosContato não esta vázia
+    if (!empty($_SESSION['dadosContato'])) {
+        $id        = $_SESSION['dadosContato']['id'];
+        $nome      = $_SESSION['dadosContato']['nome'];
+        $telefone  = $_SESSION['dadosContato']['telefone'];
+        $celular   = $_SESSION['dadosContato']['celular'];
+        $email     = $_SESSION['dadosContato']['email'];
+        $obs       = $_SESSION['dadosContato']['obs'];
+        $foto      = $_SESSION['dadosContato']['foto'];
+        $idEstado  = $_SESSION['dadosContato']['idEstado'];
 
-            // Mudamos a ação do form para editar o registro no click do botao salvar
-            $form = (string) "router.php?component=contatos&action=editar&id=" .$id. "&foto=" .$foto;
+        // Mudamos a ação do form para editar o registro no click do botao salvar
+        $form = (string) "router.php?component=contatos&action=editar&id=" . $id . "&foto=" . $foto;
 
-            //Destroi uma variável da memória do servidor 
-            unset($_SESSION['dadosContato']);
-        }
+        //Destroi uma variável da memória do servidor 
+        unset($_SESSION['dadosContato']);
     }
+}
 
 ?>
 <!DOCTYPE>
@@ -57,13 +60,38 @@
         <div id="cadastroInformacoes">
             <!-- enctype="multipart/form-data"
             Essa opção é obrigatória para enviar arquivos do formulário em html para o servidor. -->
-            <form action="<?=$form?>" name="frmCadastro" method="post" enctype="multipart/form-data">
+            <form action="<?= $form ?>" name="frmCadastro" method="post" enctype="multipart/form-data">
                 <div class="campos">
                     <div class="cadastroInformacoesPessoais">
                         <label> Nome: </label>
                     </div>
                     <div class="cadastroEntradaDeDados">
-                        <input type="text" name="txtNome" value="<?= isset($nome)?$nome:null ?>" placeholder="Digite seu Nome" maxlength="100">
+                        <input type="text" name="txtNome" value="<?= isset($nome) ? $nome : null ?>" placeholder="Digite seu Nome" maxlength="100">
+                    </div>
+                </div>
+
+                <div class="campos">
+                    <div class="cadastroInformacoesPessoais">
+                        <label> Estado: </label>
+                    </div>
+                    <div class="cadastroEntradaDeDados">
+                        <select name="sltEstado">
+                            <option value=""> Selecione um item </option>
+                            <?php
+
+                            // import da controller de estados
+                            require_once('controller/controllerEstados.php');
+
+                            // Chama a função para carregar todos os estados do banco 
+                            $listEstados = listarEstado();
+
+                            foreach ($listEstados as $item) {
+                            ?>
+                                <option <?= $idEstado == $item['idEstado'] ? 'selected' : null ?> value="<?= $item['idEstado'] ?>"><?= $item['nome'] ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
                     </div>
                 </div>
 
@@ -72,7 +100,7 @@
                         <label> Telefone: </label>
                     </div>
                     <div class="cadastroEntradaDeDados">
-                        <input type="tel" name="txtTelefone" value="<?= isset($telefone)?$telefone:null ?>">
+                        <input type="tel" name="txtTelefone" value="<?= isset($telefone) ? $telefone : null ?>">
                     </div>
                 </div>
                 <div class="campos">
@@ -80,7 +108,7 @@
                         <label> Celular: </label>
                     </div>
                     <div class="cadastroEntradaDeDados">
-                        <input type="tel" name="txtCelular" value="<?= isset($celular)?$celular:null ?>">
+                        <input type="tel" name="txtCelular" value="<?= isset($celular) ? $celular : null ?>">
                     </div>
                 </div>
 
@@ -90,7 +118,7 @@
                         <label> Email: </label>
                     </div>
                     <div class="cadastroEntradaDeDados">
-                        <input type="email" name="txtEmail" value="<?= isset($email)?$email: null ?>">
+                        <input type="email" name="txtEmail" value="<?= isset($email) ? $email : null ?>">
                     </div>
                 </div>
                 <div class="campos">
@@ -106,11 +134,11 @@
                         <label> Observações: </label>
                     </div>
                     <div class="cadastroEntradaDeDados">
-                        <textarea name="txtObs" cols="50" rows="7"><?= isset($obs)?$email:null ?></textarea>
+                        <textarea name="txtObs" cols="50" rows="7"><?= isset($obs) ? $email : null ?></textarea>
                     </div>
                 </div>
                 <div class="campos">
-                    <img src="<?= DIRETORIO_FILE_UPLOAD.$foto?>">
+                    <img src="<?= DIRETORIO_FILE_UPLOAD . $foto ?>">
                 </div>
                 <div class="enviar">
                     <div class="enviar">
@@ -140,37 +168,38 @@
             require_once('controller/controllerContatos.php');
 
             // Chama a função que vai retornar os dados de contatos
-            $listContato = listarContato();
+            if ($listContato = listarContato()) {
 
-            // Estrutura de repetição para retornar os dados dos array e printar na tela
-            foreach ($listContato as $item) {
+                // Estrutura de repetição para retornar os dados dos array e printar na tela
+                foreach ($listContato as $item) {
 
-                // variavel para carregar a foto que veio do banco de dados
-                $foto = $item['foto'];
+                    // variavel para carregar a foto que veio do banco de dados
+                    $foto = $item['foto'];
 
             ?>
 
-                <tr id="tblLinhas">
-                    <td class="tblColunas registros"><?= $item['nome'] ?></td>
-                    <td class="tblColunas registros"><?= $item['celular'] ?></td>
-                    <td class="tblColunas registros"><?= $item['email'] ?></td>
-                    <td class="tblColunas registros"><img src="<?=DIRETORIO_FILE_UPLOAD.$foto?>" class="foto"></td>
+                    <tr id="tblLinhas">
+                        <td class="tblColunas registros"><?= $item['nome'] ?></td>
+                        <td class="tblColunas registros"><?= $item['celular'] ?></td>
+                        <td class="tblColunas registros"><?= $item['email'] ?></td>
+                        <td class="tblColunas registros"><img src="<?= DIRETORIO_FILE_UPLOAD . $foto ?>" class="foto"></td>
 
-                    <td class="tblColunas registros">
-                        
-                        <a href="router.php?component=contatos&action=buscar&id=<?= $item['id'] ?>">
-                            <img src="img/edit.png" alt="Editar" title="Editar" class="editar">
-                        </a>
+                        <td class="tblColunas registros">
 
-                        <a onclick="return confirm('Deseja realmente excluir esse registro?')" href="router.php?component=contatos&action=deletar&id=<?= $item['id'] ?>&foto=<?= $foto ?>">
-                            <img src="img/trash.png" alt="Excluir" title="Excluir" class="excluir">
-                        </a>
-                        
-                        <img src="img/search.png" alt="Visualizar" title="Visualizar" class="pesquisar">
-                    </td>
-                </tr>
- 
+                            <a href="router.php?component=contatos&action=buscar&id=<?= $item['id'] ?>">
+                                <img src="img/edit.png" alt="Editar" title="Editar" class="editar">
+                            </a>
+
+                            <a onclick="return confirm('Deseja realmente excluir esse registro?')" href="router.php?component=contatos&action=deletar&id=<?= $item['id'] ?>&foto=<?= $foto ?>">
+                                <img src="img/trash.png" alt="Excluir" title="Excluir" class="excluir">
+                            </a>
+
+                            <img src="img/search.png" alt="Visualizar" title="Visualizar" class="pesquisar">
+                        </td>
+                    </tr>
+
             <?php
+                }
             }
             ?>
         </table>

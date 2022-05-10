@@ -8,6 +8,8 @@
  * Versão: 1.0
  *************************************************************************************/
 
+require_once('./modulo/config.php');
+
 // Função para receber dados da View w caminhar para a model (inserir)
 function inserirContato($dadosContato, $file)
 {
@@ -16,7 +18,7 @@ function inserirContato($dadosContato, $file)
     // Validação para verificar se o objeto esta vazio
     if (!empty($dadosContato)) {
         // Validação de caixa vazia dos elementos nome, celular e email, pois são obrigatórios no banco de dados
-        if (!empty($dadosContato['txtNome']) && !empty($dadosContato['txtCelular']) && !empty($dadosContato['txtEmail'])) {
+        if (!empty($dadosContato['txtNome']) && !empty($dadosContato['txtCelular']) && !empty($dadosContato['txtEmail']) && !empty($dadosContato['sltEstado'])) {
 
             // Validação para identificar se chegou um arquivo para upload
             if ($file['fileFoto']['name'] != null) {
@@ -43,7 +45,8 @@ function inserirContato($dadosContato, $file)
                 "celular"   => $dadosContato['txtCelular'],
                 "email"     => $dadosContato['txtEmail'],
                 "obs"       => $dadosContato['txtObs'],
-                "foto"      => $nomeFoto
+                "foto"      => $nomeFoto,
+                "idestado"  => $dadosContato['sltEstado']
 
             );
 
@@ -68,6 +71,7 @@ function inserirContato($dadosContato, $file)
 // Função para receber dados da View w caminhar para a model (atualizar)
 function atualizarContato($dadosContato, $arrayDados)
 {
+    $statusUpload = (bool) false;
     //Recebe o id enviado pelo arrayDados
     $idContato = $arrayDados['id'];
 
@@ -93,6 +97,7 @@ function atualizarContato($dadosContato, $arrayDados)
 
                     // Chama a função de upload colocando-a em uma variável para enviar a nova foto ao servidor
                     $novaFoto = uploadFile($file['fileFoto']);
+                    $statusUpload = true;
                 } else {
                     // Permanece a mesma foto no bd
                     $novaFoto = $foto;
@@ -108,15 +113,21 @@ function atualizarContato($dadosContato, $arrayDados)
                     "celular"   => $dadosContato['txtCelular'],
                     "email"     => $dadosContato['txtEmail'],
                     "obs"       => $dadosContato['txtObs'],
-                    "foto"      => $novaFoto
-
+                    "foto"      => $novaFoto,
+                    "idEstado"  => $dadosContato['sltEstado']
                 );
 
                 // import do arquivo de modelagem para manipular o BD
                 require_once('./model/bd/contato.php');
                 // Chama a função que fará o insert no BD (esta função esta no model)
                 if (updateContato($arrayDados)) {
-                    unlink(DIRETORIO_FILE_UPLOAD . $foto);
+
+                    // Validação para verificar se será necessário apagar a foto antiga 
+                    // Esta variável foi ativada em true quando realizar o upload de uma nova foto no servidor (linha 90)
+                    if ($statusUpload) {
+                        // Apaga a foto antiga da pasta do servidor 
+                        unlink(DIRETORIO_FILE_UPLOAD . $foto);
+                    }
                     return true;
                 } else
                     return array(

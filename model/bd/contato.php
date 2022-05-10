@@ -26,14 +26,16 @@ function insertContato($dadosContato)
                 celular, 
                 email, 
                 observacao,
-                foto)
+                foto,
+                idestado)
             values
             ('" . $dadosContato['nome'] . "',
 			'" . $dadosContato['telefone'] . "', 
 			'" . $dadosContato['celular'] . "', 
 			'" . $dadosContato['email'] . "',
             '" . $dadosContato['obs'] . "',
-            '" . $dadosContato['foto'] . "');";
+            '" . $dadosContato['foto'] . "',
+            '" . $dadosContato['idestado'] . "');";
 
     // Executando o Script no Banco de dados ( passando como parâmetros, o próprio banco de dados e o script que será executado)
     // Validação para verificar se o script está correto 
@@ -65,9 +67,10 @@ function updateContato($dadosContato)
                 celular    = '" . $dadosContato['celular'] . "', 
                 email      = '" . $dadosContato['email'] . "', 
                 observacao = '" . $dadosContato['obs'] . "',
-                foto       = '" . $dadosContato['foto'] . "'
-            where idcontato =" . $dadosContato['id']; 
-            
+                foto       = '" . $dadosContato['foto'] . "',
+                idEstado   = '" . $dadosContato['idEstado'] . "'
+            where idcontato =" . $dadosContato['id'];
+
 
     // Executando o Script no Banco de dados ( passando como parâmetros, o próprio banco de dados e o script que será executado)
     // Validação para verificar se o script está correto 
@@ -142,7 +145,8 @@ function selectAllContato()
                 "celular"   =>  $rsDados['celular'],
                 "email"     =>  $rsDados['email'],
                 "obs"       =>  $rsDados['observacao'],
-                "foto"      =>  $rsDados['foto']
+                "foto"      =>  $rsDados['foto'],
+                "idEstado"  =>  $rsDados['idEstado']
             );
             $cont++;
         }
@@ -150,7 +154,10 @@ function selectAllContato()
         // Solicita o fechamento da conexão com o Banco de dados
         fecharConexaoMysql($conexao);
 
-        return $arrayDados;
+        if (isset($arrayDados))
+            return $arrayDados;
+        else
+            return false;
     }
 }
 
@@ -183,11 +190,12 @@ function selectByIdContato($id)
                 "celular"   =>  $rsDados['celular'],
                 "email"     =>  $rsDados['email'],
                 "obs"       =>  $rsDados['observacao'],
-                "foto"       =>  $rsDados['foto']
+                "foto"       =>  $rsDados['foto'],
+                "idEstado"  =>  $rsDados['idEstado']
             );
         }
     }
-    
+
     // Solicita o fechamento da conexão com o Banco de dados
     fecharConexaoMysql($conexao);
 
