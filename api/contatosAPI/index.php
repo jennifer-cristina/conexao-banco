@@ -119,7 +119,6 @@ $app->delete('/contatos/{id}', function ($request, $response, $args) {
                 return $response->withStatus(200)
                     ->withHeader('Content-Type', 'application/json')
                     ->write('{"message": "Registro excluído com sucesso!"}');
-
             } elseif (is_array($resposta) && isset($resposta['idErro'])) {
 
                 // Validação referente ao erro 5, que significa que o registro foi excluído do BD e a imagem não existia no servidor
@@ -129,7 +128,6 @@ $app->delete('/contatos/{id}', function ($request, $response, $args) {
                     return $response->withStatus(200)
                         ->withHeader('Content-Type', 'application/json')
                         ->write('{"message": "Registro excluído com sucesso, porém houve um problema na exclusão da imagem na pasta do servidor"}');
-
                 } else {
 
                     // Converte para JSON o erro, pois a controller retorna em array
@@ -143,7 +141,6 @@ $app->delete('/contatos/{id}', function ($request, $response, $args) {
                                      }');
                 }
             }
-            
         } else {
 
             // Retorna um erro que significa que o cliente informou um id inválido
@@ -162,6 +159,84 @@ $app->delete('/contatos/{id}', function ($request, $response, $args) {
 
 // EndPoint: requisição para inserir um novo contato
 $app->post('/contatos', function ($request, $response, $args) {
+
+    // Recebe do header da requisição qual será o content-type
+    $contentTypeHeader = $request->getHeaderLine('Content-Type');
+
+    // Cria um array, pois dependendo do content-type temos mais informações separadas pelo ;
+    $contentType = explode(";", $contentTypeHeader);
+
+    switch ($contentType[0]) {
+        case 'multipart/form-data':
+
+            // Recebe os dados comuns enviado pelo da requisição
+            $dadosBody = $request->getParsedBody();
+
+            // Recebe uma imagem enviada pelo da requisição
+            $uploadFiles = $request->getUploadedFiles();
+
+            // Cria um array com todos s dados que chegaram pela requisição, devido aos dados serem protegidos
+            // Ciramos um array e recuperamos os dados pelos metodos do objeto
+            $arrayFoto = array( "name"      => $uploadFiles['foto']->getClientFileName(),
+                                "type"      => $uploadFiles['foto']->getClientMediaType(),
+                                "size"      => $uploadFiles['foto']->getSize(),
+                                "tmp_name"  => $uploadFiles['foto']->file
+
+                              );
+
+            // Cria uma chave chamada "foto" para colocar todos os dados objeto, conforme é gerado em form HTMl
+            $file = array("foto" => $arrayFoto);
+
+            // Cria um array com todos os dados comuns e do arquivo que será enviado para o servidor
+            $arrayDados = array( $dadosBody,
+                                 "file"  => $file
+
+            );
+
+            // Import da controller de contatos, que fará a busca de dados
+            require_once('../modulo/config.php');
+            require_once('../controller/controllerContatos.php');
+
+            // Chama a função da controller para inserir os dados
+            $resposta = inserirContato($arrayDados);
+
+            if(is_bool($resposta) && $resposta == true) {
+
+                return $response->withStatus(201)
+                                ->withHeader('Content-Type', 'application/json')
+                                ->write('{"message": "Registro inserido com sucesso."}');
+
+            }elseif (is_array($resposta) && $resposta['idErro']){
+
+                // Cria o JSON dos dados do erro
+                $dadosJSON = createJSON($resposta);
+
+                return $response->withStatus(400)
+                                ->withHeader('Content-Type', 'application/json')
+                                ->write('{"message": "Houve um problema no processo de inserir.",
+                                          "Erro": '.$dadosJSON.'
+                                        }');
+
+            }
+
+            break;
+
+        case 'application/json':
+
+            return $response->withStatus(200)
+                            ->withHeader('Content-Type', 'application/json')
+                            ->write('{"message": "Formato selecionado foi JSON."}');
+
+            break;
+        
+        default:
+            
+            return $response->withStatus(400)
+                            ->withHeader('Content-Type', 'application/json')
+                            ->write('{"message": "Formato do Content-Type não é válido para esta requisição."}');
+
+        break;
+    }
 });
 
 // Executa todos os EndPoints
